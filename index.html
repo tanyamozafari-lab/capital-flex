@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shopify Capital Flex breakdown</title>
+<style>
+  :root {
+    --bg: #f6f6f7;
+    --card: #ffffff;
+    --text: #202223;
+    --muted: #6d7175;
+    --border: #e1e3e5;
+    --accent: #008060;
+    --accent-dark: #006e52;
+    --accent-soft: #e3f1ed;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    margin: 0;
+    padding: 32px 20px;
+    line-height: 1.5;
+  }
+  .container { max-width: 920px; margin: 0 auto; }
+  header { margin-bottom: 24px; }
+  h1 { font-size: 28px; margin: 0 0 4px; font-weight: 600; letter-spacing: -0.01em; }
+  .subtitle { color: var(--muted); margin: 0; font-size: 15px; }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 16px;
+  }
+  h2 { font-size: 16px; font-weight: 600; margin: 0 0 16px; }
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+  }
+  label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 4px; }
+  .helper { font-size: 12px; color: var(--muted); margin: 6px 0 0; line-height: 1.4; }
+  .field-helper { font-size: 11px; color: var(--muted); margin: 4px 0 0; line-height: 1.35; font-style: italic; opacity: 0.85; }
+  .tip {
+    position: relative;
+    cursor: help;
+    border-bottom: 1px dotted var(--muted);
+    display: inline-block;
+  }
+  .tip::after {
+    content: attr(data-tip);
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: #202223;
+    color: white;
+    padding: 8px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: normal;
+    line-height: 1.4;
+    width: max-content;
+    max-width: 320px;
+    white-space: pre-line;
+    text-align: left;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s;
+    z-index: 10;
+  }
+  .tip::before {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-bottom-color: #202223;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s;
+    z-index: 10;
+  }
+  .tip:hover::after, .tip:hover::before { opacity: 1; }
+  .tip.tip-up::after { top: auto; bottom: calc(100% + 8px); }
+  .tip.tip-up::before { top: auto; bottom: 100%; border-top-color: #202223; border-bottom-color: transparent; }
+  input[type="text"], input[type="number"] {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: inherit;
+    color: var(--text);
+    background: white;
+  }
+  input:focus {
+    outline: 2px solid var(--accent);
+    outline-offset: -1px;
+    border-color: var(--accent);
+  }
+  .button-row { display: flex; gap: 8px; margin-top: 16px; align-items: center; }
+  button {
+    background: var(--accent);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  button:hover { background: var(--accent-dark); }
+  button.secondary {
+    background: white;
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+  button.secondary:hover { background: #f6f6f7; }
+  .copy-feedback {
+    color: var(--accent);
+    font-size: 13px;
+    opacity: 0;
+    transition: opacity .2s;
+  }
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 12px;
+  }
+  .stat {
+    background: var(--accent-soft);
+    padding: 16px;
+    border-radius: 8px;
+  }
+  .stat .label {
+    color: var(--muted);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+  .stat .value {
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: -0.01em;
+  }
+  .stat .sub {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+  .table-wrap { overflow: auto; max-height: 540px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { padding: 8px 10px; text-align: center; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  th {
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    background: #fafbfb;
+    position: sticky;
+    top: 0;
+  }
+  th:first-child, td:first-child { border-right: 2px solid var(--border); font-variant-numeric: tabular-nums; }
+  .empty { color: var(--muted); font-style: italic; padding: 24px; text-align: center; margin: 0; }
+  .toggle-row { margin-top: 12px; text-align: center; }
+  .footnote { color: var(--muted); font-size: 12px; margin-top: 12px; margin-bottom: 0; }
+  @media (max-width: 600px) {
+    body { padding: 16px 12px; }
+    h1 { font-size: 22px; }
+    .stat .value { font-size: 18px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>Your Shopify Capital Flex breakdown</h1>
+    <p class="subtitle" id="merchant-line">A custom view of your Flex offer</p>
+  </header>
+
+  <section class="card">
+    <h2>Offer inputs</h2>
+    <div class="form-grid">
+      <div>
+        <label for="merchant">Merchant / store name</label>
+        <input type="text" id="merchant" placeholder="ABC Company">
+      </div>
+      <div>
+        <label for="offer">Total offer ($)</label>
+        <input type="number" id="offer" step="0.01">
+      </div>
+      <div>
+        <label for="draw">Example draw amount ($)</label>
+        <input type="number" id="draw" step="0.01">
+      </div>
+      <div>
+        <label for="fee">Monthly fee (%)</label>
+        <input type="number" id="fee" step="0.01">
+      </div>
+      <div>
+        <label for="rate"><span class="tip tip-up" data-tip="% of your daily Shopify sales that goes toward repayment.&#10;&#10;You can choose your remittance rate when you draw — find it in Admin > Finance > Capital Flex. Available rates depend on the draw amount; a higher rate means faster payoff and lower total fees.">Remittance rate (%)</span></label>
+        <input type="number" id="rate" step="0.01">
+      </div>
+      <div>
+        <label for="sales">Estimated monthly sales ($)</label>
+        <input type="number" id="sales" step="0.01">
+      </div>
+    </div>
+    <div class="button-row">
+      <button type="button" id="copy-link">Copy share link</button>
+      <button type="button" class="secondary" id="reset">Reset</button>
+      <span class="copy-feedback" id="copy-feedback">Link copied</span>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Summary</h2>
+    <div class="summary-grid">
+      <div class="stat">
+        <div class="label">Estimated duration</div>
+        <div class="value" id="duration">—</div>
+        <div class="sub" id="duration-sub"></div>
+      </div>
+      <div class="stat">
+        <div class="label">Total fees</div>
+        <div class="value" id="total-cost">—</div>
+        <div class="sub" id="total-cost-pct"></div>
+      </div>
+      <div class="stat">
+        <div class="label">Daily repayment</div>
+        <div class="value" id="daily-repayment">—</div>
+        <div class="sub" id="daily-rate-sub"></div>
+      </div>
+      <div class="stat">
+        <div class="label">Total repaid</div>
+        <div class="value" id="total-repaid">—</div>
+        <div class="sub">Principal + fees</div>
+      </div>
+    </div>
+    <p class="footnote">This calculator approximates with ~30.5 days/month and assumes steady monthly sales, so your actual duration and cost will vary slightly based on the calendar and your daily sales.</p>
+  </section>
+
+  <section class="card">
+    <h2>Daily repayment schedule</h2>
+    <div class="table-wrap">
+      <p class="empty" id="schedule-empty">Fill in the inputs above to see the day-by-day breakdown.</p>
+      <table id="schedule-table" style="display: none;">
+        <thead>
+          <tr>
+            <th>Day</th>
+            <th>Starting principal</th>
+            <th><span class="tip" data-tip="Outstanding balance × (monthly fee ÷ days in current month)">Daily fee rate</span></th>
+            <th>Repayment</th>
+            <th>Remaining principal</th>
+            <th>Fee accrued</th>
+            <th>Total fees</th>
+          </tr>
+        </thead>
+        <tbody id="schedule-body"></tbody>
+      </table>
+    </div>
+    <div class="toggle-row" id="toggle-row" style="display: none;">
+      <button type="button" class="secondary" id="toggle-all">Show all days</button>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>What if you pay it off early?</h2>
+    <p class="footnote" style="margin: 0 0 16px;">One of the best parts of Flex: you can make a manual payment at any time to pay down or fully pay off your remaining balance. Doing so stops fee accrual on whatever you pay off — so paying early lowers your total cost.</p>
+    <div class="form-grid" style="grid-template-columns: minmax(180px, 280px);">
+      <div>
+        <label for="payoff-day">Pay off on day</label>
+        <input type="number" id="payoff-day" min="1" step="1">
+      </div>
+    </div>
+    <div class="summary-grid" style="margin-top: 16px;">
+      <div class="stat">
+        <div class="label">Balance to pay off</div>
+        <div class="value" id="payoff-balance">—</div>
+        <div class="sub">Remaining principal that day</div>
+      </div>
+      <div class="stat">
+        <div class="label">Total fees paid</div>
+        <div class="value" id="payoff-fees">—</div>
+        <div class="sub" id="payoff-fees-sub"></div>
+      </div>
+      <div class="stat">
+        <div class="label">Total repaid</div>
+        <div class="value" id="payoff-total">—</div>
+        <div class="sub">Principal + fees</div>
+      </div>
+      <div class="stat">
+        <div class="label">Savings vs. full term</div>
+        <div class="value" id="payoff-savings">—</div>
+        <div class="sub" id="payoff-savings-sub"></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+const DAYS_PER_MONTH = 30.5;
+const COLLAPSED_DAYS = 15;
+let showAll = false;
+let lastSchedule = [];
+
+const $ = (id) => document.getElementById(id);
+
+function fmt$(n) {
+  if (!isFinite(n)) return '—';
+  return n.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function fmtPct(n, digits = 2) {
+  if (!isFinite(n)) return '—';
+  return (n * 100).toFixed(digits) + '%';
+}
+
+function calculate(draw, monthlyFee, repaymentRate, monthlySales) {
+  const dailyFeeRate = (monthlyFee / 100) / DAYS_PER_MONTH;
+  const dailyRepayment = (monthlySales * (repaymentRate / 100)) / DAYS_PER_MONTH;
+
+  const schedule = [];
+  let principal = draw;
+  let totalInterest = 0;
+  let day = 1;
+  const maxDays = 365 * 5;
+
+  while (principal > 0.005 && day <= maxDays) {
+    const startingPrincipal = principal;
+    const dailyFee = startingPrincipal * dailyFeeRate;
+    const repayment = Math.min(dailyRepayment, startingPrincipal);
+    const remainingPrincipal = startingPrincipal - repayment;
+    totalInterest += dailyFee;
+    schedule.push({ day, startingPrincipal, dailyFeeRate, dailyFee, repayment, remainingPrincipal, totalInterest });
+    principal = remainingPrincipal;
+    day++;
+  }
+
+  const durationDays = schedule.length;
+  return {
+    schedule,
+    durationDays,
+    durationMonths: durationDays / DAYS_PER_MONTH,
+    totalInterest,
+    totalCostPct: draw > 0 ? totalInterest / draw : 0,
+    dailyRepayment,
+    dailyFeeRate,
+    totalRepaid: draw + totalInterest,
+  };
+}
+
+function readInputs() {
+  return {
+    merchant: $('merchant').value.trim(),
+    offer: parseFloat($('offer').value),
+    draw: parseFloat($('draw').value),
+    fee: parseFloat($('fee').value),
+    rate: parseFloat($('rate').value),
+    sales: parseFloat($('sales').value),
+  };
+}
+
+function render() {
+  const v = readInputs();
+  let subtitle = v.merchant ? `Custom Flex breakdown for ${v.merchant}` : 'A custom view of your Flex offer';
+  if (isFinite(v.draw) && v.draw > 0 && isFinite(v.offer) && v.offer > 0) {
+    subtitle += ` — modeling a ${fmt$(v.draw)} draw of your ${fmt$(v.offer)} offer`;
+  }
+  $('merchant-line').textContent = subtitle;
+
+  const valid = isFinite(v.draw) && v.draw > 0
+    && isFinite(v.fee) && v.fee >= 0
+    && isFinite(v.rate) && v.rate > 0
+    && isFinite(v.sales) && v.sales > 0;
+
+  if (!valid) {
+    ['duration', 'total-cost', 'daily-repayment', 'total-repaid'].forEach(id => $(id).textContent = '—');
+    ['duration-sub', 'total-cost-pct', 'daily-rate-sub'].forEach(id => $(id).textContent = '');
+    $('schedule-table').style.display = 'none';
+    $('schedule-empty').style.display = 'block';
+    $('toggle-row').style.display = 'none';
+    lastSchedule = [];
+    return;
+  }
+
+  const r = calculate(v.draw, v.fee, v.rate, v.sales);
+  lastSchedule = r.schedule;
+
+  $('duration').textContent = r.durationMonths.toFixed(1) + ' mo';
+  $('duration-sub').textContent = `${r.durationDays} days`;
+  $('total-cost').textContent = fmt$(r.totalInterest);
+  $('total-cost-pct').textContent = fmtPct(r.totalCostPct) + ' of draw';
+  $('daily-repayment').textContent = fmt$(r.dailyRepayment);
+  $('daily-rate-sub').textContent = fmtPct(r.dailyFeeRate, 4) + ' daily fee';
+  $('total-repaid').textContent = fmt$(r.totalRepaid);
+
+  renderSchedule();
+  renderPayoff();
+}
+
+function renderPayoff() {
+  const day = parseInt($('payoff-day').value, 10);
+  const clear = () => {
+    ['payoff-balance', 'payoff-fees', 'payoff-total', 'payoff-savings'].forEach(id => $(id).textContent = '—');
+    $('payoff-fees-sub').textContent = '';
+    $('payoff-savings-sub').textContent = '';
+  };
+  if (!lastSchedule.length || !day || day < 1 || day > lastSchedule.length) {
+    clear();
+    return;
+  }
+  const entry = lastSchedule[day - 1];
+  const fullFees = lastSchedule[lastSchedule.length - 1].totalInterest;
+  const draw = lastSchedule[0].startingPrincipal;
+  const savings = fullFees - entry.totalInterest;
+  const totalRepaid = draw + entry.totalInterest;
+
+  $('payoff-balance').textContent = fmt$(entry.remainingPrincipal);
+  $('payoff-fees').textContent = fmt$(entry.totalInterest);
+  $('payoff-total').textContent = fmt$(totalRepaid);
+  $('payoff-savings').textContent = fmt$(savings);
+  $('payoff-fees-sub').textContent = draw > 0 ? `${fmtPct(entry.totalInterest / draw)} of draw` : '';
+  $('payoff-savings-sub').textContent = fullFees > 0 ? `${fmtPct(savings / fullFees)} of full-term fees` : '';
+}
+
+function renderSchedule() {
+  if (!lastSchedule.length) return;
+  const rows = showAll ? lastSchedule : lastSchedule.slice(0, COLLAPSED_DAYS);
+  $('schedule-body').innerHTML = rows.map(r => `
+    <tr>
+      <td>${r.day}</td>
+      <td>${fmt$(r.startingPrincipal)}</td>
+      <td>${fmtPct(r.dailyFeeRate, 4)}</td>
+      <td>${fmt$(r.repayment)}</td>
+      <td>${fmt$(r.remainingPrincipal)}</td>
+      <td>${fmt$(r.dailyFee)}</td>
+      <td>${fmt$(r.totalInterest)}</td>
+    </tr>
+  `).join('');
+  $('schedule-table').style.display = 'table';
+  $('schedule-empty').style.display = 'none';
+
+  if (lastSchedule.length > COLLAPSED_DAYS) {
+    $('toggle-row').style.display = 'block';
+    $('toggle-all').textContent = showAll
+      ? `Show first ${COLLAPSED_DAYS} days`
+      : `Show all ${lastSchedule.length} days`;
+  } else {
+    $('toggle-row').style.display = 'none';
+  }
+}
+
+function loadFromURL() {
+  const p = new URLSearchParams(window.location.search);
+  ['merchant', 'offer', 'draw', 'fee', 'rate', 'sales'].forEach(key => {
+    if (p.has(key)) $(key).value = p.get(key);
+  });
+  render();
+}
+
+function copyLink() {
+  const v = readInputs();
+  const params = new URLSearchParams();
+  if (v.merchant) params.set('merchant', v.merchant);
+  ['offer', 'draw', 'fee', 'rate', 'sales'].forEach(key => {
+    if (isFinite(v[key])) params.set(key, v[key]);
+  });
+  const base = window.location.origin && window.location.origin !== 'null'
+    ? `${window.location.origin}${window.location.pathname}`
+    : window.location.href.split('?')[0];
+  const url = `${base}?${params}`;
+  navigator.clipboard.writeText(url).then(() => {
+    const fb = $('copy-feedback');
+    fb.style.opacity = '1';
+    setTimeout(() => { fb.style.opacity = '0'; }, 1500);
+  }).catch(() => {
+    prompt('Copy this link:', url);
+  });
+}
+
+function reset() {
+  ['merchant', 'offer', 'draw', 'fee', 'rate', 'sales', 'payoff-day'].forEach(id => $(id).value = '');
+  history.replaceState({}, '', window.location.pathname);
+  showAll = false;
+  render();
+}
+
+['merchant', 'offer', 'draw', 'fee', 'rate', 'sales'].forEach(id => $(id).addEventListener('input', render));
+$('payoff-day').addEventListener('input', renderPayoff);
+$('copy-link').addEventListener('click', copyLink);
+$('reset').addEventListener('click', reset);
+$('toggle-all').addEventListener('click', () => { showAll = !showAll; renderSchedule(); });
+
+loadFromURL();
+</script>
+</body>
+</html>
