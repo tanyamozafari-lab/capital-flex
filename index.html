@@ -514,6 +514,7 @@ function loadFromURL() {
   ['merchant', 'offer', 'draw', 'fee', 'rate', 'sales'].forEach(key => {
     if (p.has(key)) $(key).value = p.get(key);
   });
+  if (p.has('payoff')) $('payoff-day').value = p.get('payoff');
   render();
 }
 
@@ -524,6 +525,8 @@ function copyLink() {
   ['offer', 'draw', 'fee', 'rate', 'sales'].forEach(key => {
     if (isFinite(v[key])) params.set(key, v[key]);
   });
+  const payoff = parseInt($('payoff-day').value, 10);
+  if (isFinite(payoff) && payoff > 0) params.set('payoff', payoff);
   const base = window.location.origin && window.location.origin !== 'null'
     ? `${window.location.origin}${window.location.pathname}`
     : window.location.href.split('?')[0];
@@ -550,23 +553,10 @@ $('copy-link').addEventListener('click', copyLink);
 $('reset').addEventListener('click', reset);
 $('toggle-all').addEventListener('click', () => { showAll = !showAll; renderSchedule(); });
 
-let payoffCardWasHidden = false;
 window.addEventListener('beforeprint', () => {
   if (lastSchedule.length && !showAll) {
     showAll = true;
     renderSchedule();
-  }
-  const payoffDay = $('payoff-day').value.trim();
-  if (!payoffDay) {
-    const payoffCard = $('payoff-day').closest('.card');
-    if (payoffCard) { payoffCard.style.display = 'none'; payoffCardWasHidden = true; }
-  }
-});
-window.addEventListener('afterprint', () => {
-  if (payoffCardWasHidden) {
-    const payoffCard = $('payoff-day').closest('.card');
-    if (payoffCard) payoffCard.style.display = '';
-    payoffCardWasHidden = false;
   }
 });
 
