@@ -181,6 +181,52 @@
     h1 { font-size: 22px; }
     .stat .value { font-size: 18px; }
   }
+  @media print {
+    @page { margin: 0.5in; }
+    body { background: white; padding: 0; font-size: 11pt; }
+    .container { max-width: none; }
+    .card {
+      background: white;
+      border: 1px solid #ddd;
+      box-shadow: none;
+      page-break-inside: avoid;
+      margin-bottom: 12px;
+    }
+    .button-row,
+    .toggle-row,
+    .copy-feedback { display: none !important; }
+    input[type="text"], input[type="number"] {
+      border: none;
+      padding: 2px 0;
+      background: transparent;
+      font-weight: 600;
+      color: var(--text);
+      font-size: 14px;
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: textfield;
+    }
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    .table-wrap { overflow: visible; max-height: none; }
+    th {
+      position: static;
+      background: #fafbfb !important;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    thead { display: table-header-group; }
+    tr { page-break-inside: avoid; }
+    .stat {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    .tip { border-bottom: none; cursor: default; }
+    .tip::after, .tip::before { display: none !important; }
+  }
 </style>
 </head>
 <body>
@@ -503,6 +549,26 @@ $('payoff-day').addEventListener('input', renderPayoff);
 $('copy-link').addEventListener('click', copyLink);
 $('reset').addEventListener('click', reset);
 $('toggle-all').addEventListener('click', () => { showAll = !showAll; renderSchedule(); });
+
+let payoffCardWasHidden = false;
+window.addEventListener('beforeprint', () => {
+  if (lastSchedule.length && !showAll) {
+    showAll = true;
+    renderSchedule();
+  }
+  const payoffDay = $('payoff-day').value.trim();
+  if (!payoffDay) {
+    const payoffCard = $('payoff-day').closest('.card');
+    if (payoffCard) { payoffCard.style.display = 'none'; payoffCardWasHidden = true; }
+  }
+});
+window.addEventListener('afterprint', () => {
+  if (payoffCardWasHidden) {
+    const payoffCard = $('payoff-day').closest('.card');
+    if (payoffCard) payoffCard.style.display = '';
+    payoffCardWasHidden = false;
+  }
+});
 
 loadFromURL();
 </script>
